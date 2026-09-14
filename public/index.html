@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuantFolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">QuantFolio</div>
+      <nav class="tabs" id="tabBar">
+        <button class="tab active" data-view="planner">Planner</button>
+        <button class="tab" data-view="portfolio">Portfolio</button>
+        <button class="tab" data-view="explorer">Explorer</button>
+      </nav>
+      <div class="topbar-right">
+        <div class="fx-chip" id="fxRate" title="Live USD to INR">
+          <span class="fx-flag">$</span>
+          <span class="fx-val" id="fxValue">&mdash;</span>
+          <span class="fx-sub" id="fxSub">USD/INR</span>
+          <span class="fx-change up" id="fxChange" style="display:none"></span>
+        </div>
+        <span class="status-dot"></span>
+        <span class="status-label">Engine online</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="tape" id="ticker">
+    <div class="tape-inner" id="tapeContent"></div>
+  </div>
+
+  <main>
+
+    <!-- PLANNER -->
+    <section id="view-planner" class="view active">
+      <div class="planner-layout">
+
+        <aside class="sidebar">
+          <div class="sidebar-section">
+            <h3 class="section-title">Investment Capital</h3>
+            <div class="input-group">
+              <span class="input-prefix">&#8377;</span>
+              <input id="capitalInput" type="text" inputmode="numeric" value="50,000" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="presets" id="presetRow">
+              <button class="preset" data-amount="25000">25K</button>
+              <button class="preset active" data-amount="50000">50K</button>
+              <button class="preset" data-amount="100000">1L</button>
+              <button class="preset" data-amount="500000">5L</button>
+            </div>
+            <p class="hint">Lump-sum. Range &#8377;1,000 &ndash; &#8377;1,00,00,000.</p>
+          </div>
+
+          <div class="sidebar-section">
+            <h3 class="section-title">Risk Profile</h3>
+            <div class="risk-group" id="riskProfileGroup">
+              <button class="risk-btn" data-profile="conservative">
+                <span class="risk-label">Conservative</span>
+                <span class="risk-range">8&ndash;10%</span>
+              </button>
+              <button class="risk-btn selected" data-profile="balanced">
+                <span class="risk-label">Balanced</span>
+                <span class="risk-range">11&ndash;14%</span>
+              </button>
+              <button class="risk-btn" data-profile="aggressive">
+                <span class="risk-label">Aggressive</span>
+                <span class="risk-range">15&ndash;18%</span>
+              </button>
+              <button class="risk-btn" data-profile="growth">
+                <span class="risk-label">High Growth</span>
+                <span class="risk-range">18&ndash;22%</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="sidebar-section">
+            <h3 class="section-title">Time Horizon</h3>
+            <div class="slider-header">
+              <span id="horizonValue">7</span>
+              <small>years</small>
+            </div>
+            <input id="horizonSlider" type="range" min="1" max="20" step="1" value="7" />
+            <div class="slider-range"><span>1</span><span>20</span></div>
+            <p class="hint" id="horizonNote"></p>
+          </div>
+        </aside>
+
+        <section class="content">
+
+          <div class="alert">
+            <strong>Returns are not guaranteed.</strong>
+            Projections are model estimates. Past performance does not indicate future results.
+          </div>
+
+          <div class="metrics">
+            <div class="metric">
+              <div class="metric-label">Deployed Capital</div>
+              <div class="metric-value" id="metricCapital">&mdash;</div>
+              <div class="metric-sub" id="metricCapitalSub">lump-sum</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Expected CAGR</div>
+              <div class="metric-value" id="metricCagr">&mdash;</div>
+              <div class="metric-sub" id="metricCagrSub">&mdash;</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Projected Corpus</div>
+              <div class="metric-value" id="metricFinal">&mdash;</div>
+              <div class="metric-sub" id="metricFinalSub">&mdash;</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Equity Exposure</div>
+              <div class="metric-value" id="metricRisk">&mdash;</div>
+              <div class="metric-sub" id="metricRiskSub">&mdash;</div>
+            </div>
+          </div>
+
+          <div class="card growth-card">
+            <div class="card-head">
+              <div>
+                <h3 class="card-title">Projected Growth</h3>
+                <p class="card-sub">Monte Carlo projection of your lump-sum corpus</p>
+              </div>
+              <div class="chart-legend">
+                <span class="lg"><span class="lg-dot"></span>Expected</span>
+                <span class="lg"><span class="lg-dot dashed"></span>Low / High band</span>
+              </div>
+            </div>
+            <div class="growth-chart"><canvas id="growthChart"></canvas></div>
+            <p class="hint" id="growthSummary"></p>
+          </div>
+
+          <div class="two-col">
+            <div class="card">
+              <h3 class="card-title">Allocation</h3>
+              <div class="chart-area"><canvas id="allocationChart"></canvas></div>
+              <div id="allocLegend" class="legend"></div>
+            </div>
+            <div class="card">
+              <h3 class="card-title">Scenarios</h3>
+              <div id="spectrum" class="scenarios"></div>
+              <p class="hint" id="spectrumNote"></p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Recommended Holdings</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Asset</th>
+                    <th>Type</th>
+                    <th>Sector</th>
+                    <th class="num">Weight</th>
+                    <th class="num">Amount</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="holdingsBody">
+                  <tr><td colspan="6" class="empty">Generating&hellip;</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </section>
+      </div>
+    </section>
+
+    <!-- PORTFOLIO -->
+    <section id="view-portfolio" class="view">
+      <div class="view-header">
+        <h2>Portfolio</h2>
+        <button id="refreshPortfolio" class="btn-outline">Refresh</button>
+      </div>
+      <div class="metrics">
+        <div class="metric"><div class="metric-label">Invested</div><div class="metric-value" id="portInvested">&mdash;</div></div>
+        <div class="metric"><div class="metric-label">Current Value</div><div class="metric-value" id="portCurrent">&mdash;</div></div>
+        <div class="metric"><div class="metric-label">P/L</div><div class="metric-value" id="portPnl">&mdash;</div><div class="metric-sub" id="portPnlSub">&mdash;</div></div>
+        <div class="metric"><div class="metric-label">Positions</div><div class="metric-value" id="portCount">&mdash;</div></div>
+      </div>
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Asset</th>
+                <th>Type</th>
+                <th class="num">Units</th>
+                <th class="num">Invested</th>
+                <th class="num">Value</th>
+                <th class="num">P/L</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="portfolioBody">
+              <tr><td colspan="7" class="empty">Loading&hellip;</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPLORER -->
+    <section id="view-explorer" class="view">
+      <div class="view-header">
+        <h2>Explorer</h2>
+      </div>
+      <div class="explorer-bar">
+        <input id="search" class="search-box" placeholder="Search instruments&hellip;" autocomplete="off" spellcheck="false" />
+        <div id="typeFilter" class="filter-group"></div>
+      </div>
+      <div id="libraryList" class="asset-grid"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    QuantFolio &middot; Educational tool, not investment advice.
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
