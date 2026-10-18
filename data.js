@@ -723,6 +723,58 @@ const curated = [
     kind: "direct",
   },
 
+  {
+    id: "BSE",
+    name: "BSE Ltd",
+    symbol: "BSE",
+    type: "stock",
+    cat: "equity",
+    price: 3287,
+    ret: 15,
+    risk: 4,
+    score: 80,
+    min: 3287,
+    sector: "Financial Services",
+    cap: "large",
+    mcap: 134000,
+    vol: 1200,
+    kind: "direct",
+  },
+  {
+    id: "CAMS",
+    name: "Computer Age Management Services",
+    symbol: "CAMS",
+    type: "stock",
+    cat: "equity",
+    price: 672,
+    ret: 13,
+    risk: 3,
+    score: 78,
+    min: 672,
+    sector: "Financial Services",
+    cap: "mid",
+    mcap: 16700,
+    vol: 600,
+    kind: "direct",
+  },
+  {
+    id: "CUPID",
+    name: "Cupid Ltd",
+    symbol: "CUPID",
+    type: "stock",
+    cat: "equity",
+    price: 366,
+    ret: 16,
+    risk: 5,
+    score: 70,
+    min: 366,
+    sector: "Healthcare",
+    cap: "small",
+    mcap: 1620,
+    vol: 450,
+    kind: "direct",
+  },
+
   // ---- Mutual Funds ----
   {
     id: "MF_UTI_N50",
@@ -918,6 +970,145 @@ const curated = [
     sector: "Small Cap",
     cap: "small",
     kind: "active",
+  },
+
+  // ---- Top / Mid / Small Cap additions ----
+  {
+    id: "MF_HDFC_TOP100",
+    name: "HDFC Top 100 Fund",
+    symbol: "HDFC-T100",
+    type: "mf",
+    cat: "equity",
+    price: 980,
+    ret: 13,
+    risk: 3,
+    score: 88,
+    min: 500,
+    sector: "Large Cap",
+    cap: "large",
+    kind: "active",
+  },
+  {
+    id: "MF_AXIS_BLUE",
+    name: "Axis Bluechip Fund",
+    symbol: "AXIS-BC",
+    type: "mf",
+    cat: "equity",
+    price: 52,
+    ret: 12,
+    risk: 3,
+    score: 86,
+    min: 500,
+    sector: "Large Cap",
+    cap: "large",
+    kind: "active",
+  },
+  {
+    id: "MF_KOTAK_EMERG",
+    name: "Kotak Emerging Equity Fund",
+    symbol: "KOTAK-EE",
+    type: "mf",
+    cat: "equity",
+    price: 105,
+    ret: 15,
+    risk: 4,
+    score: 87,
+    min: 500,
+    sector: "Mid Cap",
+    cap: "mid",
+    kind: "active",
+  },
+  {
+    id: "MF_AXIS_MID",
+    name: "Axis Midcap Fund",
+    symbol: "AXIS-MID",
+    type: "mf",
+    cat: "equity",
+    price: 95,
+    ret: 15,
+    risk: 4,
+    score: 85,
+    min: 500,
+    sector: "Mid Cap",
+    cap: "mid",
+    kind: "active",
+  },
+  {
+    id: "MF_NIPPON_SMALL",
+    name: "Nippon India Small Cap Fund",
+    symbol: "NIPPON-SC",
+    type: "mf",
+    cat: "equity",
+    price: 125,
+    ret: 17,
+    risk: 5,
+    score: 83,
+    min: 500,
+    sector: "Small Cap",
+    cap: "small",
+    kind: "active",
+  },
+  {
+    id: "MF_QUANT_SMALL",
+    name: "Quant Small Cap Fund",
+    symbol: "QUANT-SC",
+    type: "mf",
+    cat: "equity",
+    price: 210,
+    ret: 18,
+    risk: 5,
+    score: 82,
+    min: 500,
+    sector: "Small Cap",
+    cap: "small",
+    kind: "active",
+  },
+
+  // ---- Fund of Funds (beginner friendly) ----
+  {
+    id: "MF_FOF_BALANCED",
+    name: "HDFC Balanced Advantage Fund of Funds",
+    symbol: "HDFC-BAFOF",
+    type: "mf",
+    cat: "equity",
+    price: 120,
+    ret: 11,
+    risk: 2,
+    score: 86,
+    min: 500,
+    sector: "Fund of Funds",
+    cap: "large",
+    kind: "fof",
+  },
+  {
+    id: "MF_FOF_GROWTH",
+    name: "ICICI Pru Multi-Asset Fund of Funds",
+    symbol: "ICICI-MAFOF",
+    type: "mf",
+    cat: "equity",
+    price: 95,
+    ret: 12,
+    risk: 3,
+    score: 87,
+    min: 500,
+    sector: "Fund of Funds",
+    cap: "large",
+    kind: "fof",
+  },
+  {
+    id: "MF_FOF_DEBTPLUS",
+    name: "SBI Conservative Hybrid Fund of Funds",
+    symbol: "SBI-CHOFOF",
+    type: "mf",
+    cat: "debt",
+    price: 60,
+    ret: 8,
+    risk: 1,
+    score: 82,
+    min: 500,
+    sector: "Fund of Funds",
+    cap: "large",
+    kind: "fof",
   },
 
   // ---- ETFs ----
@@ -1198,6 +1389,7 @@ function generateUniverse() {
         mcap,
         vol,
         kind: "direct",
+        gen: true,
       });
       global++;
     }
@@ -1205,7 +1397,7 @@ function generateUniverse() {
   return out;
 }
 
-const assets = curated.concat(generateUniverse());
+const assets = curated;
 const stocks = assets.filter((a) => a.type === "stock");
 const equityFunds = assets.filter(
   (a) => a.cat === "equity" && (a.type === "mf" || a.type === "etf"),
@@ -1306,6 +1498,52 @@ function bucketsFor(prof, years) {
   return { equity: 100 - d - gold, debt: d, gold };
 }
 
+// Cheapest purchasable ticket in each category. Small SIPs cannot clear the
+// minimum for every sleeve (a gold ETF starts around 620), so a target bucket
+// below its own ticket is unbuyable and its money has to go somewhere real.
+const CHEAPEST_TICKET = (() => {
+  const m = {};
+  for (const a of equityFunds.concat(assets)) {
+    if (a.min > 0 && (m[a.cat] === undefined || a.min < m[a.cat])) m[a.cat] = a.min;
+  }
+  return m;
+})();
+
+// Fold any bucket the capital cannot afford into the buckets it can, so the
+// stated mix always describes something the user is able to buy.
+function feasibleBuckets(b, amt) {
+  const out = { ...b };
+  for (let pass = 0; pass < 4; pass++) {
+    const dead = ["equity", "debt", "gold"].filter(
+      (k) => out[k] > 0 && (amt * out[k]) / 100 < (CHEAPEST_TICKET[k] || 0),
+    );
+    if (!dead.length) break;
+    const freed = dead.reduce((s, k) => s + out[k], 0);
+    dead.forEach((k) => {
+      out[k] = 0;
+    });
+    let live = ["equity", "debt", "gold"].filter((k) => out[k] > 0);
+    if (!live.length) {
+      out[dead[0]] = freed;
+      break;
+    }
+    const ls = live.reduce((s, k) => s + out[k], 0) || 1;
+    live.forEach((k) => {
+      out[k] += (freed * out[k]) / ls;
+    });
+  }
+  // Integer percentages that still add up to 100 (server validates this).
+  const keys = ["equity", "debt", "gold"];
+  const rounded = {};
+  let sum = 0;
+  for (const k of keys) {
+    rounded[k] = Math.floor(out[k]);
+    sum += rounded[k];
+  }
+  rounded[keys.reduce((a, b) => (out[a] >= out[b] ? a : b))] += 100 - sum;
+  return rounded;
+}
+
 // Horizon-aware candidate shortlist. Longer timeframes tilt the ranking
 // toward higher expected returns (more compounding runway = more risk capacity).
 function candidatesFor(prof, r, years) {
@@ -1348,12 +1586,16 @@ function invest(cands, budget, opts) {
   const maxPicks = opts.maxPicks || 8;
   let remaining = budget;
 
-  const grid = (a, raw) =>
-    raw < 1
-      ? 0
-      : a.type === "mf"
-        ? Math.round((raw / a.price).toFixed(2) * a.price)
-        : Math.floor(raw / a.price) * a.price;
+  // Units a user can actually buy out of `raw`. Always rounds DOWN so a
+  // position can never claim more than the budget it was handed.
+  const grid = (a, raw) => {
+    if (raw < 1) return 0;
+    if (a.type === "mf") {
+      const units = Math.floor((raw / a.price) * 100) / 100;
+      return units > 0 ? +(units * a.price).toFixed(2) : 0;
+    }
+    return Math.floor(raw / a.price) * a.price;
+  };
 
   const roomFor = (a, amt) =>
     !applyCap ||
@@ -1373,24 +1615,9 @@ function invest(cands, budget, opts) {
     const ex = picksMap.get(a.id);
     if (ex) {
       ex.units = +(+ex.units + units).toFixed(2);
-      ex.amount += amt;
+      ex.amount = +(ex.amount + amt).toFixed(2);
     } else {
-      picksMap.set(a.id, {
-        id: a.id,
-        name: a.name,
-        symbol: a.symbol,
-        type: a.type,
-        cat: a.cat,
-        price: a.price,
-        ret: a.ret,
-        risk: a.risk,
-        sector: a.sector,
-        cap: a.cap,
-        mcap: a.mcap,
-        vol: a.vol,
-        units,
-        amount: amt,
-      });
+      picksMap.set(a.id, pickOf(a, units, amt));
     }
     remaining -= amt;
     if (applyCap && Number.isFinite(sectorCapAmt))
@@ -1423,45 +1650,108 @@ function invest(cands, budget, opts) {
     if (amt >= a.min) addOr(a, amt);
   }
 
-  for (const a of ranked) {
-    if (remaining < 1) break;
-    if (remaining < a.min) continue;
-    const amt = grid(a, remaining);
-    if (amt < a.min) continue;
-    addOr(a, amt);
-    if (picksMap.size >= maxPicks * 1.5 && remaining < perUnit) break;
+  // Pass 2 is the concentration tail: whatever pass 1 could not place (unit
+  // rounding, a minimum ticket, a sector cap) is handed back out to the names
+  // that still have room, proportionally, so the budget closes exactly.
+  for (let round = 0; round < 8 && remaining >= 1; round++) {
+    const slots = Math.max(0, maxPicks - picksMap.size);
+    const live = ranked
+      .filter((a) => !picksMap.has(a.id))
+      .slice(0, slots)
+      .filter((a) => remaining >= a.min && roomFor(a, Math.min(remaining, a.min)));
+    if (!live.length) break;
+    const lsum = live.reduce((s, a) => s + weight(a), 0) || 1;
+    const base = remaining;
+    let moved = 0;
+    for (const a of live) {
+      if (remaining < 1) break;
+      let want = Math.min(remaining, (base * weight(a)) / lsum);
+      if (want < a.min) continue;
+      want = Math.min(want, remaining);
+      const amt = grid(a, want);
+      if (amt < a.min || !addOr(a, amt)) continue;
+      moved += amt;
+    }
+    if (moved < 1) break;
+  }
+
+  // Basket is full and money is still unplaced (typically a sector cap): park
+  // the remainder on the best name that will still take it.
+  if (remaining >= 1) {
+    for (const a of ranked) {
+      if (remaining < 1) break;
+      const amt = grid(a, remaining);
+      if (amt >= a.min && addOr(a, amt)) break;
+    }
   }
 
   return [...picksMap.values()];
 }
 
+function pickOf(a, units, amount) {
+  return {
+    id: a.id,
+    name: a.name,
+    symbol: a.symbol,
+    type: a.type,
+    cat: a.cat,
+    price: a.price,
+    ret: a.ret,
+    risk: a.risk,
+    sector: a.sector,
+    cap: a.cap,
+    mcap: a.mcap,
+    vol: a.vol,
+    units,
+    amount,
+  };
+}
+
+// Score-weighted spread that always places the whole budget. A single
+// proportional pass strands cash whenever a name's share falls under its
+// minimum ticket or under one unit, which is the normal case for small SIPs.
+// Each round hands the unplaced remainder to whatever is still affordable, so
+// the capital converges on the budget instead of evaporating.
 function investWeighted(cands, budget) {
-  const picks = [];
-  const ssum = cands.reduce((s, a) => s + a.score, 0) || 1;
-  for (const a of cands) {
-    const want = Math.round((budget * a.score) / ssum);
-    if (want < a.min) continue;
-    const units = +(want / a.price).toFixed(2);
-    const amt = Math.round(units * a.price);
-    if (amt > 0)
-      picks.push({
-        id: a.id,
-        name: a.name,
-        symbol: a.symbol,
-        type: a.type,
-        cat: a.cat,
-        price: a.price,
-        ret: a.ret,
-        risk: a.risk,
-        sector: a.sector,
-        cap: a.cap,
-        mcap: a.mcap,
-        vol: a.vol,
-        units,
-        amount: amt,
-      });
+  const picksMap = new Map();
+  let remaining = budget;
+  const pool = cands.filter((a) => a.min <= budget);
+  if (!pool.length || remaining < 1) return [];
+
+  const put = (a, want) => {
+    const units = Math.floor((want / a.price) * 100) / 100;
+    if (!(units > 0)) return 0;
+    const amt = +(units * a.price).toFixed(2);
+    const ex = picksMap.get(a.id);
+    if (ex) {
+      ex.units = +(ex.units + units).toFixed(2);
+      ex.amount = +(ex.amount + amt).toFixed(2);
+    } else {
+      picksMap.set(a.id, pickOf(a, units, amt));
+    }
+    return amt;
+  };
+
+  for (let round = 0; round < 12 && remaining >= 1; round++) {
+    const live = pool.filter((a) => remaining >= a.min);
+    if (!live.length) break;
+    const ssum = live.reduce((s, a) => s + a.score, 0) || 1;
+    const base = remaining;
+    let moved = 0;
+    for (const a of live) {
+      if (remaining < 1) break;
+      const want = Math.min(remaining, (base * a.score) / ssum);
+      if (want < a.min) continue;
+      const amt = put(a, want);
+      if (amt > 0) {
+        remaining = +(remaining - amt).toFixed(2);
+        moved += amt;
+      }
+    }
+    if (moved < 1) break;
   }
-  return picks;
+
+  return [...picksMap.values()];
 }
 
 // ---------- Deterministic hash seed ----------
@@ -1546,12 +1836,16 @@ function buildPlan({
   riskProfile = "balanced",
   amount = 50000,
   horizon = 5,
+  beginner = false,
+  sip = false,
 } = {}) {
   const years = Math.min(30, Math.max(1, Math.round(horizon || 5)));
   const amt = Math.max(1000, Math.round(amount) || 50000);
   const prof = PROFILES[riskProfile] || PROFILES.balanced;
+  const smallCapital = beginner || amt < 25000;
+  const roles = smallCapital ? [] : prof.roles;
 
-  const b = bucketsFor(prof, years);
+  const b = feasibleBuckets(bucketsFor(prof, years), amt);
   const sectorW = {};
   let directSpent = 0;
   let picks = [];
@@ -1561,7 +1855,7 @@ function buildPlan({
       ? (amt * prof.constraints.sectorCapPct) / 100
       : Infinity;
 
-  for (const r of prof.roles) {
+  for (const r of roles) {
     let budget = (amt * ((r.share * b.equity) / 100)) / 100;
     if (
       prof.constraints &&
@@ -1611,30 +1905,91 @@ function buildPlan({
     (s, p) => s + (p.cat === "equity" ? p.amount : 0),
     0,
   );
-  const leftover = Math.floor(eqTarget - eqSpent);
-  if (leftover >= 500) {
-    const cands = equityFunds
-      .filter((f) => f.kind === "index" && f.type === "mf" && leftover >= f.min)
-      .sort((x, y) => y.score - x.score)
-      .slice(0, 4);
+  const leftover = eqTarget - eqSpent;
+  if (leftover >= (CHEAPEST_TICKET.equity || 1)) {
+     const cands = equityFunds
+      .filter(
+        (f) =>
+          (beginner
+            ? f.kind === "fof"
+            : f.kind === "index" && (f.type === "mf" || f.type === "etf")) &&
+          leftover >= f.min,
+      )
+      .sort((x, y) => y.score - x.score || x.min - y.min)
+      .slice(0, beginner ? 2 : 3);
     if (cands.length)
       picks = picks.concat(
-        invest(cands, leftover, { weight: (a) => a.score, maxPicks: 4 }),
+        invest(cands, leftover, { weight: (a) => a.score, maxPicks: beginner ? 2 : 3 }),
       );
   }
 
+  // Final sweep: the plan is quoted as one amount, so the picks have to add up
+  // to it. Ticket and unit granularity leaves change behind at every step; park
+  // it on the most granular instrument available (a 1-rupee debt ETF absorbs
+  // anything), preferring to top up a position the plan already holds.
+  const spend = () => picks.reduce((s, p) => s + p.amount, 0);
+  const seats = assets
+    .concat(equityFunds)
+    .filter((a) => (a.type === "mf" || a.type === "etf") && a.cat !== "gold" && a.price > 0)
+    .sort((x, y) => x.price - y.price);
+  for (let i = 0; i < 8; i++) {
+    const dust = +(amt - spend()).toFixed(2);
+    if (dust < 0.01) break;
+    const held = picks
+      .filter((p) => dust / p.price >= 0.01)
+      .sort((x, y) => x.price - y.price)[0];
+    const seat =
+      held || seats.find((a) => dust >= a.min && dust / a.price >= 0.01);
+    if (!seat) break;
+    const units = Math.floor((dust / seat.price) * 100) / 100;
+    if (!(units > 0)) break;
+    const amt2 = +(units * seat.price).toFixed(2);
+    const ex = picks.find((p) => p.id === seat.id);
+    if (ex) {
+      ex.units = +(ex.units + units).toFixed(2);
+      ex.amount = +(ex.amount + amt2).toFixed(2);
+    } else {
+      picks.push(pickOf(seat, units, amt2));
+    }
+  }
+  const allocated = +spend().toFixed(2);
+
+  let proj, final, annual;
+  if (sip) {
+    const monthsPerYear = 12;
+    const sipCorpus = (rMonthly) => {
+      const r = rMonthly;
+      const months = years * monthsPerYear;
+      return r === 0 ? amt * months : amt * ((Math.pow(1 + r, months) - 1) / r);
+    };
+    const rBase = Math.pow(1 + prof.baseCAGR / 100, 1 / 12) - 1;
+    const rLow = Math.pow(1 + prof.maxCAGR[0] / 100, 1 / 12) - 1;
+    const rHigh = Math.pow(1 + prof.maxCAGR[1] / 100, 1 / 12) - 1;
+    proj = [{ year: 0, base: 0, low: 0, high: 0 }];
+    for (let y = 1; y <= years; y++) {
+      const months = y * 12;
+      const base = (rBase === 0 ? amt * months : amt * ((Math.pow(1 + rBase, months) - 1) / rBase));
+      const low = (rLow === 0 ? amt * months : amt * ((Math.pow(1 + rLow, months) - 1) / rLow));
+      const high = (rHigh === 0 ? amt * months : amt * ((Math.pow(1 + rHigh, months) - 1) / rHigh));
+      proj.push({ year: y, base: Math.round(base), low: Math.round(low), high: Math.round(high) });
+    }
+    final = proj[proj.length - 1].base;
+    annual = +prof.baseCAGR.toFixed(1);
+  } else {
   const mc = monteCarloGBM(hashSeed(prof.id, amt, years), years, prof);
-  const proj = [{ year: 0, base: amt, low: amt, high: amt }];
+  const projTmp = [{ year: 0, base: amt, low: amt, high: amt }];
   for (let y = 1; y <= years; y++) {
-    proj.push({
+    projTmp.push({
       year: y,
       base: Math.round(amt * mc.median[y]),
       low: Math.round(amt * mc.low[y]),
       high: Math.round(amt * mc.high[y]),
     });
   }
-  const final = proj[proj.length - 1].base;
-  const annual = +((Math.pow(final / amt, 1 / years) - 1) * 100).toFixed(1);
+  proj = projTmp;
+  final = proj[proj.length - 1].base;
+  annual = +((Math.pow(final / amt, 1 / years) - 1) * 100).toFixed(1);
+  }
 
   return {
     riskProfile: prof.id,
@@ -1646,6 +2001,8 @@ function buildPlan({
     baseAnnual: +prof.baseCAGR.toFixed(1),
     buckets: b,
     picks,
+    allocated,
+    unallocated: +Math.max(0, amt - allocated).toFixed(2),
     final,
     projection: proj,
     constraints: {
